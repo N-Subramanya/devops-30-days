@@ -37,6 +37,53 @@
 - **RED** for request-driven services: **R**ate, **E**rrors, **D**uration.
 - **USE** for resources (nodes, disks, queues): **U**tilization, **S**aturation, **E**rrors.
 
+### SLI, SLO, SLA and error budget
+
+| Term | What it is | Who owns it | Payment API example |
+|---|---|---|---|
+| **SLI** (Service Level *Indicator*) | A measurement: good events ÷ total events | Engineering | % of `POST /pay` requests that return non-5xx in under 300 ms |
+| **SLO** (Service Level *Objective*) | The internal target for an SLI over a time window | Engineering + product | 99.9% over a rolling 30 days |
+| **SLA** (Service Level *Agreement*) | A contractual promise to customers, with penalties | Business / legal | 99.5% monthly availability, or customers get service credits |
+| **Error budget** | `100% − SLO`: how much failure is allowed | Everyone | 0.1% of requests, about 43 min of full outage per 30 days |
+
+**How they fit together:** the **SLI** measures, the **SLO** sets the target, and the **SLA** is the external promise. Keep **SLA < SLO < 100%**. The stricter internal SLO warns you before you break the contract, and 100% is never the right target.
+
+**Example SLI in PromQL** (availability over 30 days):
+
+```promql
+sum(rate(http_requests_total{service="payment-api", status!~"5.."}[30d]))
+/
+sum(rate(http_requests_total{service="payment-api"}[30d]))
+```
+
+#### Error budget at a glance (30-day window)
+
+| SLO | Allowed downtime | Failed requests allowed per 10M |
+|---|---|---|
+| 99% | 7 h 12 m | 100,000 |
+| 99.5% | 3 h 36 m | 50,000 |
+| 99.9% | 43 m 12 s | 10,000 |
+| 99.95% | 21 m 36 s | 5,000 |
+| 99.99% | 4 m 19 s | 1,000 |
+
+#### Using the error budget
+
+- **Budget left:** ship features, run experiments and do risky migrations.
+- **Budget burned:** freeze risky releases and spend the time on reliability work (fixes, tests, capacity).
+- The budget turns "move fast" vs "stay stable" into a number both dev and ops agree on.
+
+#### Alert on burn rate, not on every error
+
+**Burn rate** is how fast you are spending the budget. A burn rate of **1×** uses exactly the whole budget in 30 days.
+
+| Burn rate | Measured over | Budget spent | Action |
+|---|---|---|---|
+| 14.4× | 1 h (confirmed over 5 m) | 2% | 🔴 Page |
+| 6× | 6 h (confirmed over 30 m) | 5% | 🔴 Page |
+| 1× | 3 days (confirmed over 6 h) | 10% | 🟠 Ticket |
+
+This catches fast outages quickly and slow leaks eventually, without paging on every small spike.
+
 ---
 
 ## 2. Draw: metrics → logs → traces → alerts → incident
@@ -76,7 +123,8 @@ It is a one-page map for a sample `checkout-api` service: its dependencies, the 
 ## ✅ Day 01 checklist
 
 - [ ] I can explain metrics vs logs vs traces in one sentence each
-- [ ] I can name the four golden signals
+- [ ] I can name the four golden signals: latency, traffic, errors, saturation
+- [ ] I can explain SLI vs SLO vs SLA, and work out the error budget for a 99.9% SLO
 - [ ] I drew the metrics → logs → traces → alerts → incident flow
 - [ ] I built an observability map for one service
 - [ ] Every alert on that map links to a dashboard and a runbook
