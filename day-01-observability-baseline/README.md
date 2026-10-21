@@ -42,59 +42,68 @@
 ## 2. Draw: metrics → logs → traces → alerts → incident
 
 ```mermaid
-flowchart LR
-    subgraph SVC["🧩 Service"]
-        APP["App + OpenTelemetry SDK"]
+flowchart TB
+    APP["🖥️ <b>Application running on Kubernetes</b><br/>API · Pods · Database"]
+
+    subgraph SIGNALS[" "]
+        direction LR
+        M["📈 <b>Metrics</b><br/>Prometheus"]
+        L["📜 <b>Logs</b><br/>Fluent Bit → Loki"]
+        T["🔗 <b>Traces</b><br/>OpenTelemetry → Tempo"]
     end
 
-    APP -- "metrics" --> M["📈 Metrics store<br/>Prometheus"]
-    APP -- "logs (JSON + trace_id)" --> L["📜 Log store<br/>Loki"]
-    APP -- "spans" --> T["🧵 Trace store<br/>Tempo / Jaeger"]
+    G["📊 <b>Grafana</b><br/>Dashboards · Correlation · Alert visibility"]
+    A["🔔 <b>Alerting</b><br/>Prometheus alert rules → Alertmanager → On-call notification"]
+    I["🚨 <b>Incident response</b><br/>Investigate → Mitigate → Verify recovery → Review"]
 
-    M --> R{"🚨 Alert rule<br/>SLO burn / error rate"}
-    R -- "fires" --> AM["Alertmanager"]
-    AM --> PG["📟 On-call<br/>PagerDuty / Teams"]
+    APP --> SIGNALS --> G --> A --> I
 
-    PG --> I["🔥 Incident opened"]
-    I --> D["📊 Dashboard: what is wrong?"]
-    D -- "exemplar / time range" --> T
-    T -- "trace_id" --> L
-    L --> RC["🔍 Root cause"]
-    RC --> FX["🛠️ Mitigate via runbook"]
-    FX --> PM["📝 Postmortem + new alert / dashboard"]
-    PM -. "improve" .-> R
+    classDef card fill:#FFFFFF,stroke:#D4D4D4,color:#111111;
+    classDef alert fill:#FDE8D7,stroke:#F5C9A8,color:#111111;
+    classDef incident fill:#FBE0E0,stroke:#F2B8B8,color:#111111;
+    class APP,M,L,T,G card;
+    class A alert;
+    class I incident;
+    style SIGNALS fill:transparent,stroke:transparent;
 ```
 
 **How to read it**
 
-1. The service emits all three signals through one SDK (OpenTelemetry), tied together by `trace_id`.
+1. The app emits three signals, linked by `trace_id`: Prometheus scrapes metrics, Fluent Bit ships container logs to Loki, and OpenTelemetry sends traces to Tempo.
 2. **Metrics drive alerts** because they are cheap, fast and aggregate well.
 3. An alert pages on-call, and an **incident** is opened.
 4. Triage goes **wide to narrow**: dashboard (metrics) → slow or failing trace → logs for that `trace_id` → root cause.
 5. Mitigate with the runbook, then hold a **postmortem** that feeds back into better alerts and dashboards.
 
-### Incident lifecycle
+### Observability architecture: metrics, logs and traces
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Svc as Service
-    participant Mon as Prometheus
-    participant AM as Alertmanager
-    participant OC as On-call
-    participant Obs as Grafana (metrics/traces/logs)
+flowchart TB
+    P["Kubernetes Application Pods"]
 
-    Svc->>Mon: error rate rises to 5%
-    Mon->>AM: HighErrorRate firing (for 5m)
-    AM->>OC: page with dashboard + runbook links
-    OC->>Obs: check RED dashboard
-    Obs-->>OC: errors only on POST /checkout
-    OC->>Obs: open exemplar trace
-    Obs-->>OC: payment-api span times out
-    OC->>Obs: logs where trace_id = abc123
-    Obs-->>OC: "connection pool exhausted"
-    OC->>Svc: mitigate (scale / roll back)
-    Mon->>AM: alert resolved
+    P -- "Metrics" --> PROM["Prometheus"]
+    P -- "Container Logs" --> FB["Fluent Bit"]
+    P -- "Traces via instrumentation" --> OTC["OpenTelemetry Collector"]
+
+    PROM --> AR["Alert Rules"] --> AM["Alertmanager"] --> OC["On-call Engineer / Incident"]
+    FB -- "Forward Logs" --> LOKI["Loki"]
+    OTC --> JT["Jaeger / Tempo"]
+
+    PROM --> GD["Grafana Dashboards"]
+    LOKI --> GD
+    JT --> GD
+
+    OC --> INV["Investigate: Metrics → Logs → Traces"]
+    GD --> INV
+
+    classDef app fill:#DBEAFE,stroke:#2563EB,color:#111111;
+    classDef tool fill:#DCFCE7,stroke:#16A34A,color:#111111;
+    classDef alerting fill:#F3E8FF,stroke:#9333EA,color:#111111;
+    classDef incident fill:#FEE2E2,stroke:#DC2626,color:#111111;
+    class P app;
+    class PROM,FB,OTC,LOKI,JT tool;
+    class AR,AM,GD alerting;
+    class OC,INV incident;
 ```
 
 Key incident metrics to track over time: **MTTD** (time to detect), **MTTA** (time to acknowledge) and **MTTR** (time to recover).
