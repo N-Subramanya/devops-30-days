@@ -30,6 +30,7 @@ devops-30-days/
 └── day-01-observability-baseline/
     ├── README.md                     # concept + flow diagram
     ├── observability-flow.svg        # metrics → logs → traces → alerts → incident
+    ├── service-observability-map.svg # architecture + signal collection → Grafana
     └── service-observability-map.md  # the hands-on build
 ```
 

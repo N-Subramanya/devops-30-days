@@ -53,36 +53,13 @@
 4. Triage goes **wide to narrow**: dashboard (metrics) → slow or failing trace → logs for that `trace_id` → root cause.
 5. Mitigate with the runbook, then hold a **postmortem** that feeds back into better alerts and dashboards.
 
-### Observability architecture: metrics, logs and traces
+### Service map: architecture + signal collection
 
-```mermaid
-flowchart TB
-    P["Kubernetes Application Pods"]
+The top half is the service architecture. Each layer is tagged with the signals it emits. The bottom half shows how those signals are collected and correlated in Grafana.
 
-    P -- "Metrics" --> PROM["Prometheus"]
-    P -- "Container Logs" --> FB["Fluent Bit"]
-    P -- "Traces via instrumentation" --> OTC["OpenTelemetry Collector"]
-
-    PROM --> AR["Alert Rules"] --> AM["Alertmanager"] --> OC["On-call Engineer / Incident"]
-    FB -- "Forward Logs" --> LOKI["Loki"]
-    OTC --> JT["Jaeger / Tempo"]
-
-    PROM --> GD["Grafana Dashboards"]
-    LOKI --> GD
-    JT --> GD
-
-    OC --> INV["Investigate: Metrics → Logs → Traces"]
-    GD --> INV
-
-    classDef app fill:#DBEAFE,stroke:#2563EB,color:#111111;
-    classDef tool fill:#DCFCE7,stroke:#16A34A,color:#111111;
-    classDef alerting fill:#F3E8FF,stroke:#9333EA,color:#111111;
-    classDef incident fill:#FEE2E2,stroke:#DC2626,color:#111111;
-    class P app;
-    class PROM,FB,OTC,LOKI,JT tool;
-    class AR,AM,GD alerting;
-    class OC,INV incident;
-```
+<p align="center">
+  <img src="service-observability-map.svg" alt="Users → Ingress → Payment API → Database, each emitting metrics, logs and traces; collected by Prometheus, Fluent Bit → Loki and OTel Collector → Tempo; correlated in Grafana" width="100%">
+</p>
 
 Key incident metrics to track over time: **MTTD** (time to detect), **MTTA** (time to acknowledge) and **MTTR** (time to recover).
 
