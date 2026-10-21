@@ -29,6 +29,7 @@ devops-30-days/
 ├── README.md
 └── day-01-observability-baseline/
     ├── README.md                     # concept + flow diagram
+    ├── observability-flow.svg        # metrics → logs → traces → alerts → incident
     └── service-observability-map.md  # the hands-on build
 ```
 

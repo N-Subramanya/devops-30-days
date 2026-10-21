@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="740" viewBox="0 0 880 740" role="img" aria-label="Observability flow: application on Kubernetes emits metrics, logs and traces into Grafana, then alerting, then incident response">
+  <style>
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; text-anchor: middle; fill: #111111; }
+    .title { font-size: 18px; font-weight: 600; }
+    .sub { font-size: 15px; fill: #374151; }
+    .sub-sm { font-size: 13px; fill: #374151; }
+    .muted { font-size: 15px; fill: #6B7280; }
+    .card { fill: #FFFFFF; stroke: #DDDDDD; stroke-width: 1; }
+    .icon { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .arrow { fill: none; stroke: #6B7280; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- container -->
+  <rect x="4" y="4" width="872" height="732" rx="14" fill="#FCFCFC" stroke="#E5E5E5"/>
+
+  <!-- application -->
+  <g class="icon" stroke="#111111" transform="translate(428 26)">
+    <rect x="2" y="2" width="20" height="8" rx="2"/>
+    <rect x="2" y="14" width="20" height="8" rx="2"/>
+    <line x1="6" y1="6" x2="6.01" y2="6"/>
+    <line x1="6" y1="18" x2="6.01" y2="18"/>
+  </g>
+  <text class="title" x="440" y="82">Application running on Kubernetes</text>
+  <text class="muted" x="440" y="110">API · Pods · Database</text>
+
+  <!-- arrow -->
+  <path class="arrow" d="M440 140v14M435 149l5 5 5-5"/>
+
+  <!-- metrics -->
+  <rect class="card" x="18" y="172" width="272" height="98" rx="10"/>
+  <g class="icon" stroke="#16A34A" transform="translate(142 182)">
+    <path d="M4 20v-5M9 20v-8M14 20v-6M19 20V9"/>
+    <path d="M4 11l5-4 5 3 6-6"/>
+    <path d="M16 4h4v4"/>
+  </g>
+  <text class="title" x="154" y="228">Metrics</text>
+  <text class="sub-sm" x="154" y="256">Prometheus</text>
+
+  <!-- logs -->
+  <rect class="card" x="304" y="172" width="272" height="98" rx="10"/>
+  <g class="icon" stroke="#EA8A0C" transform="translate(428 182)">
+    <path d="M15 12h-5"/>
+    <path d="M15 8h-5"/>
+    <path d="M19 17V5a2 2 0 0 0-2-2H4"/>
+    <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/>
+  </g>
+  <text class="title" x="440" y="228">Logs</text>
+  <text class="sub-sm" x="440" y="256">Fluent Bit → Loki</text>
+
+  <!-- traces -->
+  <rect class="card" x="590" y="172" width="272" height="98" rx="10"/>
+  <g class="icon" stroke="#9333EA" transform="translate(714 182)">
+    <circle cx="7" cy="16" r="3.5"/>
+    <circle cx="17" cy="8" r="3.5"/>
+    <path d="M9.8 13.8l4.4-3.6"/>
+  </g>
+  <text class="title" x="726" y="228">Traces</text>
+  <text class="sub-sm" x="726" y="256">OpenTelemetry → Tempo</text>
+
+  <!-- arrow -->
+  <path class="arrow" d="M440 280v14M435 289l5 5 5-5"/>
+
+  <!-- grafana -->
+  <rect class="card" x="18" y="310" width="844" height="110" rx="10"/>
+  <g class="icon" stroke="#111111" transform="translate(428 324)">
+    <rect x="3" y="3" width="7" height="9" rx="1"/>
+    <rect x="14" y="3" width="7" height="5" rx="1"/>
+    <rect x="14" y="12" width="7" height="9" rx="1"/>
+    <rect x="3" y="16" width="7" height="5" rx="1"/>
+  </g>
+  <text class="title" x="440" y="370">Grafana</text>
+  <text class="sub" x="440" y="398">Dashboards · Correlation · Alert visibility</text>
+
+  <!-- arrow -->
+  <path class="arrow" d="M440 430v14M435 439l5 5 5-5"/>
+
+  <!-- alerting -->
+  <rect x="18" y="460" width="844" height="110" rx="10" fill="#FDE8D7"/>
+  <g class="icon" stroke="#111111" transform="translate(428 474)">
+    <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
+    <path d="M22 8c0-2.3-.8-4.3-2-6"/>
+    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
+    <path d="M4 2C2.8 3.7 2 5.7 2 8"/>
+  </g>
+  <text class="title" x="440" y="520">Alerting</text>
+  <text class="sub" x="440" y="548">Prometheus alert rules → Alertmanager → On-call notification</text>
+
+  <!-- arrow -->
+  <path class="arrow" d="M440 580v14M435 589l5 5 5-5"/>
+
+  <!-- incident response -->
+  <rect x="18" y="610" width="844" height="110" rx="10" fill="#FBE0E0"/>
+  <g class="icon" stroke="#111111" transform="translate(428 624)">
+    <path d="M7 18v-6a5 5 0 1 1 10 0v6"/>
+    <path d="M5 21a1 1 0 0 0 1-1v-1a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1a1 1 0 0 0 1 1z"/>
+    <path d="M21 12h1"/>
+    <path d="M18.5 4.5 18 5"/>
+    <path d="M2 12h1"/>
+    <path d="M12 2v1"/>
+    <path d="m4.929 4.929.707.707"/>
+    <path d="M12 12v6"/>
+  </g>
+  <text class="title" x="440" y="670">Incident response</text>
+  <text class="sub" x="440" y="698">Investigate → Mitigate → Verify recovery → Review</text>
+</svg>

@@ -41,31 +41,9 @@
 
 ## 2. Draw: metrics → logs → traces → alerts → incident
 
-```mermaid
-flowchart TB
-    APP["🖥️ <b>Application running on Kubernetes</b><br/>API · Pods · Database"]
-
-    subgraph SIGNALS[" "]
-        direction LR
-        M["📈 <b>Metrics</b><br/>Prometheus"]
-        L["📜 <b>Logs</b><br/>Fluent Bit → Loki"]
-        T["🔗 <b>Traces</b><br/>OpenTelemetry → Tempo"]
-    end
-
-    G["📊 <b>Grafana</b><br/>Dashboards · Correlation · Alert visibility"]
-    A["🔔 <b>Alerting</b><br/>Prometheus alert rules → Alertmanager → On-call notification"]
-    I["🚨 <b>Incident response</b><br/>Investigate → Mitigate → Verify recovery → Review"]
-
-    APP --> SIGNALS --> G --> A --> I
-
-    classDef card fill:#FFFFFF,stroke:#D4D4D4,color:#111111;
-    classDef alert fill:#FDE8D7,stroke:#F5C9A8,color:#111111;
-    classDef incident fill:#FBE0E0,stroke:#F2B8B8,color:#111111;
-    class APP,M,L,T,G card;
-    class A alert;
-    class I incident;
-    style SIGNALS fill:transparent,stroke:transparent;
-```
+<p align="center">
+  <img src="observability-flow.svg" alt="Application running on Kubernetes → Metrics (Prometheus), Logs (Fluent Bit → Loki), Traces (OpenTelemetry → Tempo) → Grafana → Alerting → Incident response" width="100%">
+</p>
 
 **How to read it**
 
